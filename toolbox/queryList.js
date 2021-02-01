@@ -65,7 +65,7 @@ exports.createIndexTimestamp= (table) => {
   return query;
 }
 
-
+/*
 exports.insertOrder =  (table, timestamp, open, high, low, close, volume, quoteasset, trade, takerbuybase,takerbuyquote) => `
 INSERT INTO ${table}(timestamp, open, high, low, close, volume, quoteasset, trade, takerbuybase,takerbuyquote)
 VALUES ('${timestamp}','${open}',${high},${low},${close},${volume},${quoteasset},${trade},${takerbuybase},${takerbuyquote});
@@ -74,4 +74,11 @@ VALUES ('${timestamp}','${open}',${high},${low},${close},${volume},${quoteasset}
 exports.lastOrder =  (table) => `
 SELECT MAX(timestamp)
 FROM ${table} ;
+`
+*/
+
+exports.getTicker =  (table,timestamp) => `
+SELECT open
+FROM ${table}
+WHERE  timestamp = '${timestamp}' ; 
 `
