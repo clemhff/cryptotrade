@@ -10,7 +10,6 @@ const pool = new Pool(connId);
 
 
 
-
 exports.analyseData = async(symbol, ttime, interval) => {
   timestampNow = ttime //new Date().getTime();
   timestampNowTruncate = timestampNow + (-(timestampNow % 60000));
@@ -21,7 +20,7 @@ exports.analyseData = async(symbol, ttime, interval) => {
     //console.log(timestampNowTruncate-(i*60000));
     //console.log(loadData.rows);
   }
-  console.log(data);
+  //console.log(data);
 
   var macdInput = {
     values            : data,
@@ -33,7 +32,7 @@ exports.analyseData = async(symbol, ttime, interval) => {
   }
 
   let macdResult = MACD.calculate(macdInput);
-  //macdResult = macdResult.slice(12)
+  macdResult = macdResult.slice(9)
   let macdHist = macdResult.map(x => x.histogram);
   //console.log(macdHist);
 
@@ -42,7 +41,43 @@ exports.analyseData = async(symbol, ttime, interval) => {
     period : 12
   };
   let rsiResult = RSI.calculate(inputRSI);
+  rsiResult = rsiResult.slice(22)
   //console.log(rsiResult);
 
   return [data, macdHist, rsiResult]
+}
+
+
+
+exports.decisionMaker = async(mode, analysedData) => {
+  let MACD = analysedData[1].slice() ;
+  let RSI = analysedData[2].slice() ;
+  let MACDlength = MACD.length-1;
+  /*console.log(MACDlength);
+  console.log(MACD[MACDlength]);*/
+
+  let shortMACD = (MACD[MACDlength] - MACD[MACDlength - 1 ]) / 90 ;
+  let mediumMACD =  (MACD[MACDlength] - MACD[MACDlength - 3 ]) / (3*45);
+  let longMACD = (MACD[MACDlength] - MACD[MACDlength - 5 ]) / (5*45);
+  /*console.log(shortMACD);
+  console.log(mediumMACD);
+  console.log(longMACD);*/
+
+
+  let MacdUp = (MACD[MACDlength] > 0 &&  MACD[MACDlength - 1 ] > 0 && shortMACD > 0 && mediumMACD > 0 && longMACD > 0 );
+  console.log('MACD indique ' + MacdUp);
+
+  let RSIlength = RSI.length-1;
+  let shortRSI = (RSI[RSIlength] - RSI[RSIlength - 1 ]) / 90 ;
+  let mediumRSI =  (RSI[RSIlength] - RSI[RSIlength - 3 ]) / (3*45);
+  /*console.log(shortRSI);
+  console.log(mediumRSI);*/
+
+  let RsiUp = (RSI[RSIlength] > 30 && RSI[RSIlength] < 65 && shortRSI > 0 && mediumRSI > 0);
+  console.log('RSI indique ' + RsiUp);
+
+  let finalDecision = (MacdUp === true && RsiUp === true);
+
+  return finalDecision === true ? 'BUY' : 'DON\'T BUY' ;
+
 }

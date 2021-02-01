@@ -1,26 +1,8 @@
-const q = require('./toolbox/queryList');
-const axios = require('axios');
-const {dbPoolTest} = require('./toolbox/dbtest');
-const { Pool, Client } = require('pg');
-const {connId} = require('./env/dbId');
-const {analyseData} = require('./functions/decision');
-
-
-const pool = new Pool(connId);
+const {analyseData, decisionMaker} = require('./functions/decision');
+const {checkTable} = require('./toolbox/databaseCheck');
 
 
 ///////////////////////////////////////////////////////////////////
-
-const checkTable = async(table) => {
-  const tableExist = await pool.query(q.tableName(table));
-  if(tableExist.rows.length === 0){
-
-    console.log('Table ' + table + ' doesn\'t exist');
-    const createTable = await pool.query(q.createTable(table)); // create table
-    const createIndex= await pool.query(q.createIndexTimestamp(table)); // create index
-    console.log('Table ' + table + ' created');
-  }
-};
 
 checkTable('orderhist');
 checkTable('balance');
@@ -28,7 +10,10 @@ checkTable('balance');
 //////////////////////////////////////////////////////////////////////////////////////
 
 (async () => {
-  console.log(await analyseData('adausdt', 1612080000000, 45))
+  data = await analyseData('adausdt', 1612010700000, 45);
+  //console.log(data);
+  let decision = await decisionMaker('BUY', data);
+  console.log('The final decision is ' + decision);
 })()
 
 /*////////////////////////////////////////////////////////////////////////////////
