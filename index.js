@@ -1,6 +1,6 @@
 const {analyseData, decisionMaker} = require('./functions/decision');
 const {checkTable} = require('./toolbox/databaseCheck');
-
+const {balance} = require('./functions/binance');
 
 ///////////////////////////////////////////////////////////////////
 
@@ -14,6 +14,10 @@ checkTable('balance');
   //console.log(data);
   let decision = await decisionMaker('BUY', data);
   console.log('The final decision is ' + decision);
+
+  let balanceRes = await balance('BUSD');
+  console.log(balanceRes);
+
 })()
 
 /*////////////////////////////////////////////////////////////////////////////////
