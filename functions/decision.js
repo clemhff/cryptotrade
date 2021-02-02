@@ -81,3 +81,14 @@ exports.decisionMaker = async(mode, analysedData) => {
   return finalDecision === true ? 'BUY' : 'DON\'T BUY' ;
 
 }
+
+
+exports.lastTicker= async(symbol, ttime) => {
+  timestampNow = ttime //new Date().getTime();
+  timestampNowTruncate = timestampNow + (-(timestampNow % 60000));
+
+  const loadData = await pool.query(q.getTicker (symbol, String(timestampNowTruncate))); // get a ticker price
+
+  return loadData.rows[0]
+
+}

@@ -1,6 +1,37 @@
 const crypto = require('crypto');
 const axios = require('axios');
-const {keys} = require('../env/dbId');
+const q = require('../toolbox/queryList');
+const {dbPoolTest} = require('../toolbox/dbtest');
+const { Pool, Client } = require('pg');
+const {keys, connId} = require('../env/dbId');
+
+const pool = new Pool(connId);
+
+
+exports.mode = async(symbol) => {
+
+  const saveOrder = await pool.query(q.getLastOrder(symbol));
+  //console.log(saveOrder.rows[0].mode);
+  console.log(saveOrder.rows.length);
+  let response = {};
+  if(saveOrder.rows.length === 0){
+    response = {
+      mode :  'BUY', // inversion warning
+      result: null
+    }
+  }
+  if(saveOrder.rows.length === 1){
+    response = {
+      mode : (saveOrder.rows[0].mode === 'BUY' ? 'SELL' : 'BUY'), // inversion warning
+      result: saveOrder.rows[0]
+    }
+  }
+
+  return response;
+
+}
+
+
 
 exports.balance = async(token) => {
 
@@ -38,8 +69,23 @@ exports.balance = async(token) => {
 
 }
 
+exports.buy = async(symbol, quantity) => {
+  let timestamp = Date.now();
+  let mode = 'BUY'
+  let price = 0.36
+  const saveOrder = await pool.query(q.insertOrder(timestamp, symbol, mode, quantity, price, ''));
+  console.log((saveOrder.rowCount === 1 ? 'SUCCESS' : 'FAIL'));
 
+}
 
+exports.sell = async(symbol, quantity, info) => {
+  let timestamp = Date.now();
+  let mode = 'SELL'
+  let price = 0.3402
+  const saveOrder = await pool.query(q.insertOrder(timestamp, symbol, mode, quantity, price, info));
+  console.log((saveOrder.rowCount === 1 ? 'SUCCESS' : 'FAIL'));
+
+}
 
 
 

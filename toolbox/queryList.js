@@ -42,7 +42,8 @@ exports.createTable = (table) => {
                   symbol VARCHAR(10),
                   mode VARCHAR(4),
                   quantity NUMERIC(12, 8),
-                  price NUMERIC(12, 8)
+                  price NUMERIC(12, 8),
+                  info VARCHAR(10)
               );`
       break;
       case 'balance':
@@ -65,12 +66,13 @@ exports.createIndexTimestamp= (table) => {
   return query;
 }
 
-/*
-exports.insertOrder =  (table, timestamp, open, high, low, close, volume, quoteasset, trade, takerbuybase,takerbuyquote) => `
-INSERT INTO ${table}(timestamp, open, high, low, close, volume, quoteasset, trade, takerbuybase,takerbuyquote)
-VALUES ('${timestamp}','${open}',${high},${low},${close},${volume},${quoteasset},${trade},${takerbuybase},${takerbuyquote});
+
+exports.insertOrder =  (timestamp, symbol, mode, quantity, price, info) => `
+INSERT INTO orderhist(timestamp, symbol, mode, quantity, price, info)
+VALUES ('${timestamp}','${symbol}','${mode}','${quantity}','${price}', '${info}');
 `
 
+/*
 exports.lastOrder =  (table) => `
 SELECT MAX(timestamp)
 FROM ${table} ;
@@ -80,5 +82,10 @@ FROM ${table} ;
 exports.getTicker =  (table,timestamp) => `
 SELECT open
 FROM ${table}
-WHERE  timestamp = '${timestamp}' ; 
+WHERE  timestamp = '${timestamp}' ;
+`
+exports.getLastOrder =  (symbol) => `
+SELECT *
+FROM orderhist
+WHERE  id = (SELECT MAX(id) FROM orderhist WHERE symbol = '${symbol}') ;
 `

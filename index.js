@@ -1,6 +1,6 @@
-const {analyseData, decisionMaker} = require('./functions/decision');
+const {analyseData, decisionMaker, lastTicker} = require('./functions/decision');
 const {checkTable} = require('./toolbox/databaseCheck');
-const {balance} = require('./functions/binance');
+const {balance, buy, sell, mode} = require('./functions/binance');
 
 ///////////////////////////////////////////////////////////////////
 
@@ -9,16 +9,56 @@ checkTable('balance');
 
 //////////////////////////////////////////////////////////////////////////////////////
 
-(async () => {
-  data = await analyseData('adausdt', 1612010700000, 45);
-  //console.log(data);
-  let decision = await decisionMaker('BUY', data);
-  console.log('The final decision is ' + decision);
+(async (symbol, token, theTime) => {
+  let sMode = await mode(symbol);
+  //console.log(sMode.result);
+  console.log(sMode.mode);
 
-  let balanceRes = await balance('BUSD');
-  console.log(balanceRes);
 
-})()
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  if(sMode.mode === 'BUY'){
+
+    data = await analyseData(symbol, theTime, 45); //input timestamp
+    //console.log(data[0][data[1].length-1]);
+    //console.log(data[0]);
+    let decision = await decisionMaker('BUY', data);
+    console.log('The final decision is ' + decision);
+
+    if(decision === 'BUY') {
+      let balanceRes = await balance('USDT');
+      console.log(typeof balanceRes.free);
+
+      if ((Number(balanceRes.free) + 6) > 5) {
+        console.log('inserting');
+        let buyRes = await buy(symbol, (balanceRes.free + 10)); // put quote order quantity
+      }
+
+    }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  }
+  if(sMode.mode === 'SELL') {
+
+    theLastTicker = await lastTicker(symbol, theTime);
+
+    buyPrice = Number(sMode.result.price);
+    actualPrice = Number(theLastTicker.open);
+    console.log(buyPrice);
+    console.log(actualPrice);
+
+    if(actualPrice > (buyPrice + (buyPrice * 0.01))){
+      let balanceRes = await balance(token);
+      let sellRes = await sell('symbol', balanceRes.free, 'HIGH'); // put quote order quantity
+    }
+    if(actualPrice < (buyPrice - (buyPrice * 0.01))){
+      let balanceRes = await balance(token);
+      let sellRes = await sell('symbol', balanceRes.free, 'LOW'); // put quote order quantity
+    }
+  }
+
+
+})('adausdt', 'ADA', 1612010700000)
 
 /*////////////////////////////////////////////////////////////////////////////////
 
