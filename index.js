@@ -6,9 +6,27 @@ const {checkTable} = require('./toolbox/databaseCheck');
 checkTable('orderhist');
 checkTable('balance');
 
-(async () => {
-  let myTrade = await trade('adausdt', 'ADA', 'USDT', 1612010700000, 0.01, 0.01);
-})()
+setInterval(function(){
+
+  if((Date.now()% 60000) > 30000 ) {
+
+    (async () => {
+      let myTrade = await trade('adausdt', 'ADA', 'USDT', Date.now(), 0.01, 0.01);
+    })()
+
+  }
+  else {
+    console.log(`
+      
+      waiting 1min data
+
+      `);
+  }
+
+}, 3000);
+
+
+
 
 //////////////////////////////////////////////////////////////////////////////////////
 /*

@@ -29,7 +29,7 @@ exports.trade = async (symbol, base, quote, theTime, high, low) => {
       console.log(insertB.rowCount === 1 ? 'Success insertion balance ' : ' Fail to insert balance');
       if ((Number(balanceRes.free)) > 5) {
         //console.log('inserting');
-        let buyRes = await buy(symbol, (balanceRes.free + 10)); // put quote order quantity
+        let buyRes = await buy(symbol, (balanceRes.free)); // put quote order quantity
       }
       else {
         console.log('ERROR empty wallet');
