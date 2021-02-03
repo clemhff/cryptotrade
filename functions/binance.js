@@ -10,20 +10,24 @@ const pool = new Pool(connId);
 
 exports.mode = async(symbol) => {
 
-  const saveOrder = await pool.query(q.getLastOrder(symbol));
-  //console.log(saveOrder.rows[0].mode);
-  console.log(saveOrder.rows.length);
+  const myLastOrder = await pool.query(q.getLastOrder(symbol));
+
+  //console.log(myLastOrder.rows[0]);
+
+
+  console.log(myLastOrder.rows.length === 1 ? 'GET last order OK' : 'No order for the moment');
+
   let response = {};
-  if(saveOrder.rows.length === 0){
+  if(myLastOrder.rows.length === 0){
     response = {
       mode :  'BUY', // inversion warning
       result: null
     }
   }
-  if(saveOrder.rows.length === 1){
+  if(myLastOrder.rows.length === 1){
     response = {
-      mode : (saveOrder.rows[0].mode === 'BUY' ? 'SELL' : 'BUY'), // inversion warning
-      result: saveOrder.rows[0]
+      mode : (myLastOrder.rows[0].mode === 'BUY' ? 'SELL' : 'BUY'), // inversion warning
+      result: myLastOrder.rows[0]
     }
   }
 
@@ -69,26 +73,105 @@ exports.balance = async(token) => {
 
 }
 
-exports.buy = async(symbol, quantity) => {
-  let timestamp = Date.now();
-  let mode = 'BUY'
-  let price = 0.36
-  const saveOrder = await pool.query(q.insertOrder(timestamp, symbol, mode, quantity, price, ''));
-  console.log((saveOrder.rowCount === 1 ? 'SUCCESS' : 'FAIL'));
+exports.insertBalance = async(symbol, quantity) => {
+  const insertB = await pool.query(q.insertBalance (Date.now(), symbol, quantity)); // get a ticker price
+  return insertB;
+}
+
+exports.buy = async(symbol, quoteQuantity) => {
+  let precision = quoteQuantity.match(/^-?\d+(?:\.\d{0,8})?/)[0] ;
+
+  const makeOrder = await newOrder ('BUY', 'quoteOrderQty', precision, symbol );
+  const saveOrder = await pool.query(q.insertOrder(Number(makeOrder.transactTime), symbol, makeOrder.side, makeOrder.origQty, makeOrder.fills[0].price, ''));
+  console.log((saveOrder.rowCount === 1 ? 'SUCCESS order insertion' : 'FAIL order insertion'));
 
 }
 
-exports.sell = async(symbol, quantity, info) => {
-  let timestamp = Date.now();
-  let mode = 'SELL'
-  let price = 0.3402
-  const saveOrder = await pool.query(q.insertOrder(timestamp, symbol, mode, quantity, price, info));
-  console.log((saveOrder.rowCount === 1 ? 'SUCCESS' : 'FAIL'));
+exports.sell = async(symbol, baseQuantity, info) => {
+  let precision = baseQuantity.match(/^-?\d+(?:\.\d{0,1})?/)[0] ;
+
+  const makeOrder = await newOrder ('SELL', 'quantity', precision, symbol );
+  const saveOrder = await pool.query(q.insertOrder(Number(makeOrder.transactTime), symbol, makeOrder.side, baseQuantity, makeOrder.fills[0].price, info));
+  console.log((saveOrder.rowCount === 1 ? 'SUCCESS order insertion': 'FAIL order insertion'));
 
 }
 
 
 
+
+
+const newOrder = async (side, typeQuantity, quantity, symbol) => {
+
+
+  console.log(quantity);
+
+  let burl = "https://api.binance.com";
+  let endPoint = "/api/v3/order";
+  let dataQueryString =
+  "symbol=" + symbol.toUpperCase() + "&side=" + side + "&type=MARKET&" + typeQuantity + "=" + quantity + "&recvWindow=20000&timestamp=" + Date.now();
+
+  let signature = crypto.createHmac('sha256',keys['skey']).update(dataQueryString).digest('hex');
+  let url = burl + endPoint + '?' + dataQueryString + '&signature=' + signature;
+
+  //console.log(url);
+
+  let options = {
+    method: 'post',
+    url: url,
+    timeout: 1000,
+    headers: {'X-MBX-APIKEY': keys['akey'] }
+  }
+  let res = null;
+  try {
+    res = await axios(options);
+  } catch (err) {
+    console.error("Error response:");
+    console.error(err.response.data);    // ***
+    console.error(err.response.status);  // ***
+    console.error(err.response.headers); // ***
+  }
+  console.log(`*********************************`);
+  console.log(res.data.status);
+  console.log(res.data.symbol);
+  console.log(res.data.transactTime);
+  console.log(res.data.side);
+  console.log(res.data.fills[0].price);
+  console.log(res.data.origQty);
+  console.log(`*********************************`);
+  //onsole.log(res.data);
+
+  return res.data
+
+
+};
+
+/*
+{
+  symbol: 'ADAUSDT',
+  orderId: 871348898,
+  orderListId: -1,
+  clientOrderId: 'nltk5tSbpeNU4AH06iwy0E',
+  transactTime: 1612378881496,
+  price: '0.00000000',
+  origQty: '28.90000000',
+  executedQty: '28.90000000',
+  cummulativeQuoteQty: '12.93737400',
+  status: 'FILLED',
+  timeInForce: 'GTC',
+  type: 'MARKET',
+  side: 'BUY',
+  fills: [
+    {
+      price: '0.44766000',
+      qty: '28.90000000',
+      commission: '0.02890000',
+      commissionAsset: 'ADA',
+      tradeId: 65019988
+    }
+  ]
+}
+
+*/
 
   /*/////////////////////////////////////////////////////////////
 

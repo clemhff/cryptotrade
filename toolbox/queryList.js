@@ -72,6 +72,11 @@ INSERT INTO orderhist(timestamp, symbol, mode, quantity, price, info)
 VALUES ('${timestamp}','${symbol}','${mode}','${quantity}','${price}', '${info}');
 `
 
+exports.insertBalance =  (timestamp, symbol, quantity) => `
+INSERT INTO balance(timestamp, symbol, quantity)
+VALUES ('${timestamp}','${symbol}','${quantity}');
+`
+
 /*
 exports.lastOrder =  (table) => `
 SELECT MAX(timestamp)

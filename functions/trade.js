@@ -1,18 +1,10 @@
-const {trade} = require('./functions/trade');
-const {checkTable} = require('./toolbox/databaseCheck');
-//
-///////////////////////////////////////////////////////////////////
+const {analyseData, decisionMaker, lastTicker} = require('./decision');
+const {balance, buy, sell, mode, insertBalance} = require('./binance');
 
-checkTable('orderhist');
-checkTable('balance');
 
-(async () => {
-  let myTrade = await trade('adausdt', 'ADA', 'USDT', 1612010700000, 0.01, 0.01);
-})()
 
-//////////////////////////////////////////////////////////////////////////////////////
-/*
-(async (symbol, base, quote, theTime, high, low) => {
+exports.trade = async (symbol, base, quote, theTime, high, low) => {
+  console.log(`////////////////////////// NEW TRADE FUNCTION`);
   let sMode = await mode(symbol);
   //console.log(sMode.result);
   console.log(sMode.mode);
@@ -34,9 +26,9 @@ checkTable('balance');
       let balanceRes = await balance(quote);
       let insertB = await insertBalance(quote , balanceRes.free)
       console.log('The balance for ' + balanceRes.asset + ' est de ' + balanceRes.free);
-      console.log(insertB.rowCount === 1 ? 'Sucess insertion balance ' : ' Fail to insert balance');
+      console.log(insertB.rowCount === 1 ? 'Success insertion balance ' : ' Fail to insert balance');
       if ((Number(balanceRes.free)) > 5) {
-        console.log('inserting');
+        //console.log('inserting');
         let buyRes = await buy(symbol, (balanceRes.free + 10)); // put quote order quantity
       }
       else {
@@ -80,9 +72,15 @@ checkTable('balance');
     }
   }
 
+  console.log(`
 
-})('adausdt', 'ADA', 'USDT', 1612010700000, 0.01, 0.01)
-*/
+
+    `);
+}
+
+
+//)('adausdt', 'ADA', 'USDT', 1612010700000, 0.01, 0.01)
+
 /*////////////////////////////////////////////////////////////////////////////////
 
 //Global Modules
