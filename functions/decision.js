@@ -56,29 +56,66 @@ exports.decisionMaker = async(mode, analysedData) => {
   /*console.log(MACDlength);
   console.log(MACD[MACDlength]);*/
 
-  let shortMACD = (MACD[MACDlength] - MACD[MACDlength - 1 ]) / 90 ;
-  let mediumMACD =  (MACD[MACDlength] - MACD[MACDlength - 3 ]) / (3*45);
-  let longMACD = (MACD[MACDlength] - MACD[MACDlength - 5 ]) / (5*45);
-  /*console.log(shortMACD);
-  console.log(mediumMACD);
-  console.log(longMACD);*/
+  let finalDecision = '';
+  let MacdUp = '';
+  let RsiUp = '';
+
+  if(mode === 'BUY') {
+
+    let shortMACD = (MACD[MACDlength] - MACD[MACDlength - 1 ]) / 90 ;
+    let mediumMACD =  (MACD[MACDlength] - MACD[MACDlength - 2 ]) / (3*45);
+    let longMACD = (MACD[MACDlength] - MACD[MACDlength - 3 ]) / (5*45);
+    /*console.log(shortMACD);
+    console.log(mediumMACD);
+    console.log(longMACD);*/
+
+    let RSIlength = RSI.length-1;
+    let shortRSI = (RSI[RSIlength] - RSI[RSIlength - 1 ]) / 90 ;
+    let mediumRSI =  (RSI[RSIlength] - RSI[RSIlength - 3 ]) / (3*45);
+    /*console.log(shortRSI);
+    console.log(mediumRSI);*/
+
+    MacdUp = (MACD[MACDlength] > 0 &&  MACD[MACDlength - 1 ] > 0 && shortMACD > 0 && mediumMACD > 0 && longMACD > 0 );
+    console.log('MACD indique ' + MacdUp);
 
 
-  let MacdUp = (MACD[MACDlength] > 0 &&  MACD[MACDlength - 1 ] > 0 && shortMACD > 0 && mediumMACD > 0 && longMACD > 0 );
-  console.log('MACD indique ' + MacdUp);
+    RsiUp = (RSI[RSIlength] > 30 && RSI[RSIlength] < 69 && shortRSI > 0 && mediumRSI > 0);
+    console.log('RSI indique ' + RsiUp);
 
-  let RSIlength = RSI.length-1;
-  let shortRSI = (RSI[RSIlength] - RSI[RSIlength - 1 ]) / 90 ;
-  let mediumRSI =  (RSI[RSIlength] - RSI[RSIlength - 3 ]) / (3*45);
-  /*console.log(shortRSI);
-  console.log(mediumRSI);*/
+    let result = (MacdUp === true && RsiUp === true);
+    finalDecision = result === true ? 'BUY' : 'DON\'T BUY';
+  }
 
-  let RsiUp = (RSI[RSIlength] > 30 && RSI[RSIlength] < 65 && shortRSI > 0 && mediumRSI > 0);
-  console.log('RSI indique ' + RsiUp);
+  if(mode === 'SELL') {
 
-  let finalDecision = (MacdUp === true && RsiUp === true);
+    let shortMACD = (MACD[MACDlength] - MACD[MACDlength - 1 ]) / 90 ;
+    let mediumMACD =  (MACD[MACDlength] - MACD[MACDlength - 2 ]) / (2*45);
+    //let longMACD = (MACD[MACDlength] - MACD[MACDlength - 3 ]) / (5*45);
+    /*console.log(shortMACD);
+    console.log(mediumMACD);
+    console.log(longMACD);*/
 
-  return finalDecision === true ? 'BUY' : 'DON\'T BUY' ;
+    let RSIlength = RSI.length-1;
+    let shortRSI = (RSI[RSIlength] - RSI[RSIlength - 1 ]) / 90 ;
+    let mediumRSI =  (RSI[RSIlength] - RSI[RSIlength - 2 ]) / (2*45);
+    /*console.log(shortRSI);
+    console.log(mediumRSI);*/
+
+    MacdUp = (shortMACD < 0 && mediumMACD < 0 );
+    console.log('MACD indique ' + MacdUp);
+
+
+
+    RsiUp = (shortRSI < 0 && mediumRSI < 0);
+    console.log('RSI indique ' + RsiUp);
+
+    let result = (MacdUp === true && RsiUp === true);
+    finalDecision = result === true ? 'SELL NOW' : 'WATCH MARGIN';
+
+  }
+
+
+  return finalDecision ;
 
 }
 

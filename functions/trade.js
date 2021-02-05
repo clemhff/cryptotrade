@@ -3,7 +3,7 @@ const {balance, buy, sell, mode, insertBalance} = require('./binance');
 
 
 
-exports.trade = async (symbol, base, quote, theTime, high, low) => {
+exports.trade = async (symbol, base, quote, theTime, high, low, intervalData) => {
   console.log(`////////////////////////// NEW TRADE FUNCTION`);
   let sMode = await mode(symbol);
   //console.log(sMode.result);
@@ -13,7 +13,7 @@ exports.trade = async (symbol, base, quote, theTime, high, low) => {
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   if(sMode.mode === 'BUY'){
 
-    data = await analyseData(symbol, theTime, 45); //input timestamp
+    data = await analyseData(symbol, theTime, intervalData); //input timestamp
     //console.log(data[0][data[1].length-1]);
     //console.log(data[0]);
 
@@ -41,35 +41,55 @@ exports.trade = async (symbol, base, quote, theTime, high, low) => {
 
   if(sMode.mode === 'SELL') {
 
+    data = await analyseData(symbol, theTime, intervalData); //input timestamp
+    console.log('GET DATA Ok');
+    console.log(data);
+
+    let decision = await decisionMaker('SELL', data);
+    console.log('The final decision is ' + decision);
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// mettre un if decision
     theLastTicker = await lastTicker(symbol, theTime);
     console.log('GET last ticker Ok');
 
-    buyPrice = Number(sMode.result.price);
-    actualPrice = Number(theLastTicker.open);
-    console.log('BUY price is ' + buyPrice);
-    console.log('Actual price is ' + actualPrice);
-
-    if(actualPrice > (buyPrice + (buyPrice * high))){
-      console.log('SELL High');
+    if(decision === 'SELL NOW'){
+      console.log('SELL before low limit');
       let balanceRes = await balance(base);
+
       let insertB = await insertBalance(base , balanceRes.free)
-
-      let sellRes = await sell(symbol, balanceRes.free, 'HIGH'); // put quote order quantity
-
-      let balanceResQ = await balance(quote);
-      let insertBQ = await insertBalance(quote , balanceResQ.free)
+      let sellRes = await sell(symbol, balanceRes.free, 'BEFORE'); // put quote order quantity
     }
-    if(actualPrice < (buyPrice - (buyPrice * low ))){
-      console.log('SELL low');
 
-      let balanceRes = await balance(base);
-      let insertB = await insertBalance(base , balanceRes.free)
+    if(decision === 'WATCH MARGIN') {
+      buyPrice = Number(sMode.result.price);
+      actualPrice = Number(theLastTicker.open);
+      console.log('BUY price is ' + buyPrice);
+      console.log('Actual price is ' + actualPrice);
 
-      let sellRes = await sell(symbol, balanceRes.free , 'LOW'); // put quote quantity
 
-      let balanceResQ = await balance(quote);
-      let insertBQ = await insertBalance(quote , balanceResQ.free)
+      if(actualPrice > (buyPrice + (buyPrice * high))){
+        console.log('SELL High');
+        let balanceRes = await balance(base);
+        let insertB = await insertBalance(base , balanceRes.free)
+
+        let sellRes = await sell(symbol, balanceRes.free, 'HIGH'); // put quote order quantity
+
+        let balanceResQ = await balance(quote);
+        let insertBQ = await insertBalance(quote , balanceResQ.free)
+      }
+      if(actualPrice < (buyPrice - (buyPrice * low ))){
+        console.log('SELL low');
+
+        let balanceRes = await balance(base);
+        let insertB = await insertBalance(base , balanceRes.free)
+
+        let sellRes = await sell(symbol, balanceRes.free , 'LOW'); // put quote quantity
+
+        let balanceResQ = await balance(quote);
+        let insertBQ = await insertBalance(quote , balanceResQ.free)
+      }
     }
+
   }
 
   console.log(`
