@@ -63,15 +63,15 @@ exports.decisionMaker = async(mode, analysedData) => {
   if(mode === 'BUY') {
 
     let shortMACD = (MACD[MACDlength] - MACD[MACDlength - 1 ]) / 90 ;
-    let mediumMACD =  (MACD[MACDlength] - MACD[MACDlength - 2 ]) / (3*45);
-    let longMACD = (MACD[MACDlength] - MACD[MACDlength - 3 ]) / (5*45);
+    let mediumMACD =  (MACD[MACDlength] - MACD[MACDlength - 2 ]) / (2*45);
+    let longMACD = (MACD[MACDlength] - MACD[MACDlength - 3 ]) / (3*45);
     /*console.log(shortMACD);
     console.log(mediumMACD);
     console.log(longMACD);*/
 
     let RSIlength = RSI.length-1;
     let shortRSI = (RSI[RSIlength] - RSI[RSIlength - 1 ]) / 90 ;
-    let mediumRSI =  (RSI[RSIlength] - RSI[RSIlength - 3 ]) / (3*45);
+    let mediumRSI =  (RSI[RSIlength] - RSI[RSIlength - 2 ]) / (2*45);
     /*console.log(shortRSI);
     console.log(mediumRSI);*/
 
@@ -90,7 +90,8 @@ exports.decisionMaker = async(mode, analysedData) => {
 
     let shortMACD = (MACD[MACDlength] - MACD[MACDlength - 1 ]) / 90 ;
     let mediumMACD =  (MACD[MACDlength] - MACD[MACDlength - 2 ]) / (2*45);
-    //let longMACD = (MACD[MACDlength] - MACD[MACDlength - 3 ]) / (5*45);
+    let longMACD = (MACD[MACDlength] - MACD[MACDlength - 3 ]) / (3*45);
+    let megaLongMACD = (MACD[MACDlength] - MACD[MACDlength - 4 ]) / (4*45);
     /*console.log(shortMACD);
     console.log(mediumMACD);
     console.log(longMACD);*/
@@ -100,8 +101,17 @@ exports.decisionMaker = async(mode, analysedData) => {
     let mediumRSI =  (RSI[RSIlength] - RSI[RSIlength - 2 ]) / (2*45);
     /*console.log(shortRSI);
     console.log(mediumRSI);*/
+    let shortDown = (shortMACD < 0);
+    console.log(shortDown);
+    let enoughHigh = (shortMACD > 0 && mediumMACD > 0 && longMACD > 0 && megaLongMACD > 0 && MACD[MACDlength] > 0 &&  MACD[MACDlength - 1] > 0 && MACD[MACDlength - 3] > 0 &&  MACD[MACDlength - 4] );
+    console.log(enoughHigh);
+    if (shortDown === true || enoughHigh === true){
+      MacdUp = true ;
+    }
+    else {
+      MacdUp = false ;
+    }
 
-    MacdUp = (shortMACD < 0 && mediumMACD < 0 );
     console.log('MACD indique ' + MacdUp);
 
 

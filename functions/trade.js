@@ -45,6 +45,8 @@ exports.trade = async (symbol, base, quote, theTime, high, low, intervalData) =>
     console.log('GET DATA Ok');
     console.log(data);
 
+    //data[2] = [79, 77, 75, 72]
+
     let decision = await decisionMaker('SELL', data);
     console.log('The final decision is ' + decision);
 
