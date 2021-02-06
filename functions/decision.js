@@ -79,7 +79,7 @@ exports.decisionMaker = async(mode, analysedData) => {
     console.log('MACD indique ' + MacdUp);
 
 
-    RsiUp = (RSI[RSIlength] > 30 && RSI[RSIlength] < 69 && shortRSI > 0 && mediumRSI > 0);
+    RsiUp = (RSI[RSIlength] > 30 && RSI[RSIlength] < 75 && shortRSI > 0 && mediumRSI > 0);
     console.log('RSI indique ' + RsiUp);
 
     let result = (MacdUp === true && RsiUp === true);
