@@ -75,7 +75,7 @@ exports.decisionMaker = async(mode, analysedData) => {
     /*console.log(shortRSI);
     console.log(mediumRSI);*/
 
-    MacdUp = (MACD[MACDlength] > 0 &&  MACD[MACDlength - 1 ] > 0 && shortMACD > 0 && mediumMACD > 0 && longMACD > 0 );
+    MacdUp = (MACD[MACDlength] > 0 &&  MACD[MACDlength - 1 ] > 0 && shortMACD > 0 && mediumMACD > 0 && longMACD > 0 && shortMACD > (0.90 * mediumMACD));
     console.log('MACD indique ' + MacdUp);
 
 
@@ -101,7 +101,7 @@ exports.decisionMaker = async(mode, analysedData) => {
     let mediumRSI =  (RSI[RSIlength] - RSI[RSIlength - 2 ]) / (2*45);
     /*console.log(shortRSI);
     console.log(mediumRSI);*/
-    let shortDown = (shortMACD < 0);
+    let shortDown = (shortMACD < 0 );
     console.log(shortDown);
     let enoughHigh = (shortMACD > 0 && mediumMACD > 0 && longMACD > 0 && megaLongMACD > 0 && MACD[MACDlength] > 0 &&  MACD[MACDlength - 1] > 0 && MACD[MACDlength - 3] > 0 &&  MACD[MACDlength - 4] );
     console.log(enoughHigh);
