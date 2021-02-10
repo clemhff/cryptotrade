@@ -65,14 +65,14 @@ exports.decisionMaker = async(mode, data) => {
     let lastTicker = data[0][39];
     console.log(lastTicker*0.0025);
 
-    let reg40onTen = ((data[1] * 10) >= (lastTicker * 0.00185) );
+    let reg40onTen = ((data[1] * 10) >= (lastTicker * 0.001) );
     console.log(reg40onTen);
-    let reg30onTen = ((data[2] * 10) >= (lastTicker * 0.0025) ) ;
+    let reg30onTen = ((data[2] * 10) >= (lastTicker * 0.002) ) ;
     console.log(reg30onTen);
     let reg15onTen = ((data[3]* 10) >= (lastTicker * 0.003) ) ;
     console.log(reg15onTen);
 
-    finalDecision = (reg40onTen === true && reg30onTen === true && reg15onTen === true) ? 'BUY' : 'DON\'T BUY';
+    finalDecision = (reg40onTen === true && reg30onTen === true ) ? 'BUY' : 'DON\'T BUY';
   }
 
   if(mode === 'SELL') {
@@ -80,9 +80,9 @@ exports.decisionMaker = async(mode, data) => {
     let lastTicker = data[0][39];
 
     //console.log(data[1]);
-    let reg30onTen = ((data[2] * 10) < (lastTicker  * 0.001) ) ;
+    let reg30onTen = ((data[2] * 10) < (lastTicker  * 0.0005) ) ;
     console.log(reg30onTen);
-    let reg15onTen = ((data[3]* 10) < (lastTicker  * (-0.0025)) ) ;
+    let reg15onTen = ((data[3]* 10) < (lastTicker  * (-0.0015)) ) ;
     console.log(reg15onTen);
     let highLow = (data[0][39] < (data[0][38] * 0.995) );
     console.log(highLow);
