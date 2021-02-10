@@ -41,7 +41,10 @@ exports.trade = async (symbol, base, quote, theTime, high, low, intervalData) =>
 
   if(sMode.mode === 'SELL') {
 
-    data = await analyseData(symbol, theTime, intervalData); //input timestamp
+    let buyPrice = Number(sMode.result.price);
+
+    let data = await analyseData(symbol, theTime, intervalData); //input timestamp
+    data.push(buyPrice);
     console.log('GET DATA Ok');
     console.log(data);
 
@@ -54,43 +57,30 @@ exports.trade = async (symbol, base, quote, theTime, high, low, intervalData) =>
     theLastTicker = await lastTicker(symbol, theTime);
     console.log('GET last ticker Ok');
 
-    if(decision === 'SELL NOW'){
-      console.log('SELL before low limit');
+    if(decision === 'HIGH LOW'){
+      console.log('SELL HIGH LOW');
       let balanceRes = await balance(base);
 
       let insertB = await insertBalance(base , balanceRes.free)
-      let sellRes = await sell(symbol, balanceRes.free, 'BEFORE'); // put quote order quantity
+      let sellRes = await sell(symbol, balanceRes.free, 'HIGH LOW'); // put quote order quantity
+    }
+    if(decision === '15 REG MIN'){
+      console.log('SELL 15 REG MIN');
+      let balanceRes = await balance(base);
+
+      let insertB = await insertBalance(base , balanceRes.free)
+      let sellRes = await sell(symbol, balanceRes.free, '15REG'); // put quote order quantity
+    }
+    if(decision === '30 REG MIN'){
+      console.log('SELL 30 REG MIN');
+      let balanceRes = await balance(base);
+
+      let insertB = await insertBalance(base , balanceRes.free)
+      let sellRes = await sell(symbol, balanceRes.free, '30REG'); // put quote order quantity
     }
 
-    if(decision === 'WATCH MARGIN') {
-      buyPrice = Number(sMode.result.price);
-      actualPrice = Number(theLastTicker.open);
-      console.log('BUY price is ' + buyPrice);
-      console.log('Actual price is ' + actualPrice);
 
 
-      if(actualPrice > (buyPrice + (buyPrice * high))){
-        console.log('SELL High');
-        let balanceRes = await balance(base);
-        let insertB = await insertBalance(base , balanceRes.free)
-
-        let sellRes = await sell(symbol, balanceRes.free, 'HIGH'); // put quote order quantity
-
-        let balanceResQ = await balance(quote);
-        let insertBQ = await insertBalance(quote , balanceResQ.free)
-      }
-      if(actualPrice < (buyPrice - (buyPrice * low ))){
-        console.log('SELL low');
-
-        let balanceRes = await balance(base);
-        let insertB = await insertBalance(base , balanceRes.free)
-
-        let sellRes = await sell(symbol, balanceRes.free , 'LOW'); // put quote quantity
-
-        let balanceResQ = await balance(quote);
-        let insertBQ = await insertBalance(quote , balanceResQ.free)
-      }
-    }
 
   }
 
