@@ -85,7 +85,7 @@ FROM ${table} ;
 */
 
 exports.getTicker =  (table,timestamp) => `
-SELECT open
+SELECT close
 FROM ${table}
 WHERE  timestamp = '${timestamp}' ;
 `

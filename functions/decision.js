@@ -37,22 +37,51 @@ const reglin = async(data) => {
   return coef/(lengthReg-2) ;
 }
 
+const movingAverage = async(data, length, before) => {
+    let lengthReg = data.length + before ;
+    let sum = 0;
+    for (let i = 0; i < length; i++) {
+      sum = sum + data[lengthReg - i - 1]
+      //console.log(data[lengthReg - i - 1]);
+    }
+    return sum/length
+}
+
 
 exports.analyseData = async(symbol, ttime, interval) => {
   const data40 = await selectData(symbol, ttime, interval, 40);
-  const reg40 = await reglin(data40);
-  console.log(reg40);
-
-  const data30 = await selectData(symbol, ttime, interval, 30);
-  const reg30 = await reglin(data30);
-  console.log(reg30);
 
   const data15 = await selectData(symbol, ttime, interval, 15);
   const reg15 = await reglin(data15);
   console.log(reg15);
 
+  const  ma7 = await movingAverage(data40, 7 , 0);
+  console.log(ma7);
 
-  return [data40, reg40, reg30, reg15]
+  const  ma7m1 = await movingAverage(data40, 7 , -1);
+  console.log(ma7m1);
+
+  const  ma7m2 = await movingAverage(data40, 7 , -2);
+  console.log(ma7m2);
+
+  const  ma7m5 = await movingAverage(data40, 7 , -5);
+  console.log(ma7m5);
+
+  const  ma25 = await movingAverage(data40, 25 , 0);
+  console.log(ma25);
+
+  const  ma25m1 = await movingAverage(data40, 25 , -1);
+  console.log(ma25m1);
+
+  const  ma25m2 = await movingAverage(data40, 25 , -3);
+  console.log(ma25m2);
+
+  const  ma25m5 = await movingAverage(data40, 25 , -5);
+  console.log(ma25m5);
+
+
+
+  return [data40, reg15, ma7, ma7m1, ma7m2 ,ma7m5, ma25, ma25m1, ma25m2, ma25m5]
 }
 
 
@@ -63,16 +92,14 @@ exports.decisionMaker = async(mode, data) => {
   if(mode === 'BUY') {
     //console.log(data[0]);
     let lastTicker = data[0][39];
-    console.log(lastTicker*0.0025);
 
-    let reg40onTen = ((data[1] * 10) >= (lastTicker * 0.001) );
-    console.log(reg40onTen);
-    let reg30onTen = ((data[2] * 10) >= (lastTicker * 0.002) ) ;
-    console.log(reg30onTen);
     let reg15onTen = ((data[3]* 10) >= (lastTicker * 0.003) ) ;
-    console.log(reg15onTen);
+    //console.log(reg15onTen);
 
-    finalDecision = (reg40onTen === true && reg30onTen === true ) ? 'BUY' : 'DON\'T BUY';
+    let seeDown = data[3] - data[5] < 0 // moyenne mobile descend
+    let seeUp = data[0] - data[1] > (lastTicker * 0.002)
+
+    finalDecision = (seeDown === true && seeUp === true ) ? 'BUY' : 'DON\'T BUY';
   }
 
   if(mode === 'SELL') {

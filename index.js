@@ -11,7 +11,7 @@ setInterval(function(){
   if((Date.now()% 60000) > 30000 ) {
 
     (async () => {
-      let myTrade = await trade('adausdt', 'ADA', 'USDT', Date.now(), 0.006, 0.012, 1);
+      let myTrade = await trade('adausdt', 'ADA', 'USDT', Date.now(), 0.005, 0.005, 1);
     })()
 
   }
@@ -30,6 +30,8 @@ setInterval(function(){
 
 //////////////////////////////////////////////////////////////////////////////////////
 /*
+Date.now()
+1612010700000
 (async (symbol, base, quote, theTime, high, low) => {
   let sMode = await mode(symbol);
   //console.log(sMode.result);

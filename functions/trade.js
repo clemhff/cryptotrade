@@ -41,21 +41,49 @@ exports.trade = async (symbol, base, quote, theTime, high, low, intervalData) =>
 
   if(sMode.mode === 'SELL') {
 
-    let buyPrice = Number(sMode.result.price);
+    let theLastTicker = await lastTicker(symbol, theTime);
+    console.log(theLastTicker);
 
-    let data = await analyseData(symbol, theTime, intervalData); //input timestamp
-    data.push(buyPrice);
-    console.log('GET DATA Ok');
-    console.log(data);
+    let buyPrice = Number(sMode.result.price);
+    console.log(buyPrice);
+    let actualPrice = Number(theLastTicker.close);
+    console.log(actualPrice);
+
+    if(actualPrice > (buyPrice + (buyPrice * high))){
+        console.log('SELL High');
+        let balanceRes = await balance(base);
+        let insertB = await insertBalance(base , balanceRes.free)
+
+        let sellRes = await sell(symbol, balanceRes.free, 'HIGH'); // put quote order quantity
+
+        let balanceResQ = await balance(quote);
+        let insertBQ = await insertBalance(quote , balanceResQ.free)
+      }
+      if(actualPrice < (buyPrice - (buyPrice * low ))){
+        console.log('SELL low');
+
+        let balanceRes = await balance(base);
+        let insertB = await insertBalance(base , balanceRes.free)
+
+        let sellRes = await sell(symbol, balanceRes.free , 'LOW'); // put quote quantity
+
+        let balanceResQ = await balance(quote);
+        let insertBQ = await insertBalance(quote , balanceResQ.free)
+      }
+      else {
+        console.log('price in the limits');
+      }
+    //nsole.log('GET DATA Ok');
+    //console.log(data);
+
 
     //data[2] = [79, 77, 75, 72]
 
-    let decision = await decisionMaker('SELL', data);
-    console.log('The final decision is ' + decision);
+    //let decision = await decisionMaker('SELL', data);
+    //console.log('The final decision is ' + decision);
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// mettre un if decision
-    theLastTicker = await lastTicker(symbol, theTime);
-    console.log('GET last ticker Ok');
+    /*nsole.log('GET last ticker Ok');
 
     if(decision === 'HIGH LOW'){
       console.log('SELL HIGH LOW');
@@ -78,6 +106,8 @@ exports.trade = async (symbol, base, quote, theTime, high, low, intervalData) =>
       let insertB = await insertBalance(base , balanceRes.free)
       let sellRes = await sell(symbol, balanceRes.free, '30REG'); // put quote order quantity
     }
+
+      */
 
 
 
