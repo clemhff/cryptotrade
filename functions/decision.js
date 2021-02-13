@@ -98,7 +98,7 @@ exports.decisionMaker = async(mode, data) => {
     //console.log(reg15onTen);
 
     let seeDown = data[3] - data[5] < 0 // moyenne mobile descend
-    let seeUp = data[0] - data[1] > (lastTicker * 0.002)
+    let seeUp = data[0] - data[1] > (lastTicker * 0.001)
 
     finalDecision = (seeDown === true && seeUp === true ) ? 'BUY' : 'DON\'T BUY';
   }
