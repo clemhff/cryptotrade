@@ -15,7 +15,8 @@ const selectData = async(symbol, ttime, interval, lengthReg) => {
   resData = [];
   for(let i = 0 ; i < (lengthReg*interval) ; i += interval) {
     const loadData = await pool.query(q.getTicker (symbol, String(timestampNowTruncate-(i*60000)))); // get a ticker price
-    resData.unshift(Number(loadData.rows[0].open));
+    //console.log(loadData.rows);
+    resData.unshift(Number(loadData.rows[0].close));
     //console.log(timestampNowTruncate-(i*60000));
     //console.log(loadData.rows);
   }
