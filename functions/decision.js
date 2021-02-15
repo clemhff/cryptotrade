@@ -66,7 +66,7 @@ exports.analyseData = async(symbol, ttime, interval) => {
   console.log(ma7m2);
 
   const  ma7m3 = await movingAverage(data40, 7 , -3);
-  console.log(ma7m5);
+  console.log(ma7m3);
 
   const  ma25 = await movingAverage(data40, 25 , 0);
   console.log(ma25);
