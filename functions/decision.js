@@ -102,7 +102,8 @@ exports.decisionMaker = async(mode, data) => {
     let seeUp = data[2] - data[3] > (lastTicker * 0.00111)
     console.log('seeUp is ' + seeUp);
     let candleHigh = data[10].close > data[10].open
-    console.log('candleHigh is ' + candleHigh);
+    console.log('candle close is ' + data[10].close);
+    console.log('candle open is ' + data[10].open);
 
     finalDecision = (seeDown === true && seeUp === true && candleHigh === true ) ? 'BUY' : 'DON\'T BUY';
   }
