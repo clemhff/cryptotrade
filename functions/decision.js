@@ -105,7 +105,7 @@ exports.decisionMaker = async(mode, data) => {
     console.log('candle close is ' + data[10].close);
     console.log('candle open is ' + data[10].open);
 
-    finalDecision = (seeDown === true && seeUp === true && candleHigh === true ) ? 'BUY' : 'DON\'T BUY';
+    finalDecision = (seeDown === true && seeUp === true ) ? 'BUY' : 'DON\'T BUY';
   }
 
   if(mode === 'SELL') {
