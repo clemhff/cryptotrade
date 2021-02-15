@@ -13,7 +13,9 @@ exports.trade = async (symbol, base, quote, theTime, high, low, intervalData) =>
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   if(sMode.mode === 'BUY'){
 
+    let theLastTicker = await lastTicker(symbol, theTime);
     data = await analyseData(symbol, theTime, intervalData); //input timestamp
+    data.push(theLastTicker);
     //console.log(data[0][data[1].length-1]);
     //console.log(data[0]);
 

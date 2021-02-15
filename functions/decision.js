@@ -65,7 +65,7 @@ exports.analyseData = async(symbol, ttime, interval) => {
   const  ma7m2 = await movingAverage(data40, 7 , -2);
   console.log(ma7m2);
 
-  const  ma7m5 = await movingAverage(data40, 7 , -5);
+  const  ma7m3 = await movingAverage(data40, 7 , -3);
   console.log(ma7m5);
 
   const  ma25 = await movingAverage(data40, 25 , 0);
@@ -74,7 +74,7 @@ exports.analyseData = async(symbol, ttime, interval) => {
   const  ma25m1 = await movingAverage(data40, 25 , -1);
   console.log(ma25m1);
 
-  const  ma25m2 = await movingAverage(data40, 25 , -3);
+  const  ma25m2 = await movingAverage(data40, 25 , -2);
   console.log(ma25m2);
 
   const  ma25m5 = await movingAverage(data40, 25 , -5);
@@ -82,7 +82,7 @@ exports.analyseData = async(symbol, ttime, interval) => {
 
 
 
-  return [data40, reg15, ma7, ma7m1, ma7m2 ,ma7m5, ma25, ma25m1, ma25m2, ma25m5]
+  return [data40, reg15, ma7, ma7m1, ma7m2 ,ma7m3, ma25, ma25m1, ma25m2, ma25m5]
 }
 
 
@@ -97,12 +97,14 @@ exports.decisionMaker = async(mode, data) => {
     let reg15onTen = ((data[3]* 10) >= (lastTicker * 0.003) ) ;
     //console.log(reg15onTen);
 
-    let seeDown = data[4] - data[5] < 0 // moyenne mobile descend
+    let seeDown = data[3] - data[4] < 0 // moyenne mobile descend
     console.log('seeDown is ' + seeDown);
-    let seeUp = data[2] - data[3] > (lastTicker * 0.001)
+    let seeUp = data[2] - data[3] > (lastTicker * 0.00111)
     console.log('seeUp is ' + seeUp);
+    let candleHigh = data[10].close > data[10].open
+    console.log('candleHigh is ' + candleHigh);
 
-    finalDecision = (seeDown === true && seeUp === true ) ? 'BUY' : 'DON\'T BUY';
+    finalDecision = (seeDown === true && seeUp === true && candleHigh === true ) ? 'BUY' : 'DON\'T BUY';
   }
 
   if(mode === 'SELL') {
