@@ -40,7 +40,7 @@ const selectData = async(symbol, ttime, interval, lengthReg) => {
   let dataFormatted = [...open, ...close, ...high, ...low, ...volume, ...trade]
 
   //console.log(dataFormatted.length)
-  console.log(resData);
+  //console.log(resData);
 
   return dataFormatted;
 }

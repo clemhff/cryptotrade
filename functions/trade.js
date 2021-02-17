@@ -15,8 +15,8 @@ exports.trade = async (symbol, base, quote, theTime, high, low, intervalData) =>
     if((Date.now()% 60000) > 5000 ) {
 
       data = await analyseData(symbol, theTime, intervalData); //input timestamp
-      console.log(data);
-      //onsole.log('GET DATA Ok');
+      //console.log(data);
+      console.log('GET DATA Ok');
 
       let decision = await decisionMaker('BUY', data);
       console.log('The final decision is ' + decision);
