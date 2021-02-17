@@ -11,7 +11,7 @@ checkTable('balance');
 
 setInterval(function(){
     (async () => {
-      let myTrade = await trade('adausdt', 'ADA', 'USDT', 1612010700000, 0.006, 0.004, 1);
+      let myTrade = await trade('adausdt', 'ADA', 'USDT', Date.now(), 0.006, 0.004, 1);
     })()
 
 }, 3000);
