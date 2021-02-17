@@ -1,6 +1,6 @@
 const {trade} = require('./functions/trade');
 const {checkTable} = require('./toolbox/databaseCheck');
-//
+////
 ///////////////////////////////////////////////////////////////////
 
 checkTable('orderhist');
