@@ -35,7 +35,32 @@ exports.mode = async(symbol) => {
 
 }
 
+exports.ticker = async(symbol) => {
+  let burl = "https://api.binance.com";
+  let endPoint = "/api/v3/ticker/price";
+  let dataQueryString = "symbol=" + symbol.toUpperCase()
+  let url = burl + endPoint + '?' + dataQueryString
 
+  let options = {
+    method: 'get',
+    url: url,
+    timeout: 1000,
+  }
+  let res = null;
+
+
+  try {
+    res = await axios(options);
+  } catch (err) {
+    console.error("Error response:");
+    console.error(err.response.data);    // ***
+    console.error(err.response.status);  // ***
+    console.error(err.response.headers); // ***
+  }
+
+  return Number(res.data.price)
+
+}
 
 exports.balance = async(token) => {
 
@@ -81,19 +106,19 @@ exports.insertBalance = async(symbol, quantity) => {
 exports.buy = async(symbol, quoteQuantity) => {
   let precision = quoteQuantity.match(/^-?\d+(?:\.\d{0,8})?/)[0] ;
 
-  const makeOrder = await newOrder ('BUY', 'quoteOrderQty', precision, symbol );
+  /*const makeOrder = await newOrder ('BUY', 'quoteOrderQty', precision, symbol );
   const saveOrder = await pool.query(q.insertOrder(Number(makeOrder.transactTime), symbol, makeOrder.side, makeOrder.origQty, makeOrder.fills[0].price, ''));
   console.log((saveOrder.rowCount === 1 ? 'SUCCESS order insertion' : 'FAIL order insertion'));
-
+*/
 }
 
 exports.sell = async(symbol, baseQuantity, info) => {
   let precision = baseQuantity.match(/^-?\d+(?:\.\d{0,1})?/)[0] ;
 
-  const makeOrder = await newOrder ('SELL', 'quantity', precision, symbol );
+  /*const makeOrder = await newOrder ('SELL', 'quantity', precision, symbol );
   const saveOrder = await pool.query(q.insertOrder(Number(makeOrder.transactTime), symbol, makeOrder.side, baseQuantity, makeOrder.fills[0].price, info));
   console.log((saveOrder.rowCount === 1 ? 'SUCCESS order insertion': 'FAIL order insertion'));
-
+*/
 }
 
 
