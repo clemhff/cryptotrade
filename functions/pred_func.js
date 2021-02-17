@@ -1,4 +1,5 @@
 const { exec } = require('child_process')
+const {path} = require('../env/dbId');
 
 function run(cmd) {
   return new Promise((resolve, reject) => {
@@ -19,7 +20,7 @@ function list(X) {
 
 
 exports.predict = async (X) => {
-  const result = await run(' cd python && /home/clement/miniconda3/envs/aaa/bin/python test.py ' + list(X) );
+  const result = await run(' cd python && ' + path['conda'] + ' test.py ' + list(X) );
   let split = result.out.split('\n');
   let json = JSON.parse(split[1]);
   result.json = json;
